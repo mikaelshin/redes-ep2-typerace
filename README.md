@@ -1,7 +1,7 @@
 # EACH 2021 - Redes de Computadores
 Repositório para o EP2 da disciplina ACH2026 - Redes de Computadores
 
-# Integrantes
+## Integrantes
 * Integrante 1 - Barbara Ellen Schorsch Finardi
 * Integrante 2 - Gandhi Daiti Miyahara
 * Integrante 3 - Lucas Yuji Tengan Ikeda
