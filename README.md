@@ -1,5 +1,5 @@
-# redes-ep2-typerace
-Repositório para o EP2 de Redes de Computadores, EACH-USP - 2021/2
+# EACH 2021 - Redes de Computadores
+Repositório para o EP2 de Redes de Computadores
 
 # Integrantes
 * Integrante 1 - Barbara Ellen Schorsch Finardi
