@@ -1,7 +1,6 @@
 package br.usp.each.typerace.server;
 
 import org.java_websocket.server.WebSocketServer;
-
 import java.util.HashMap;
 
 public class ServerMain {
@@ -12,9 +11,13 @@ public class ServerMain {
         this.server = server;
     }
 
+    public WebSocketServer getServer() {
+        return this.server;
+    }
+
     public void init() {
-        System.out.println("Iniciando servidor...");
-        // TODO: Implementar
+        this.getServer().onStart();
+
     }
 
     public static void main(String[] args) {
