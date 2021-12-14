@@ -7,8 +7,28 @@ import java.net.URI;
 
 public class Client extends WebSocketClient {
 
-    public Client(URI serverUri) {
+    private int id;
+    private int points;
+
+    public Client(URI serverUri, int id) {
+
         super(serverUri);
+        this.id = id;
+    }
+
+    public int getId() {
+
+        return this.id;
+    }
+
+    public int getPoints() {
+
+        return this.points;
+    }
+
+    public void setPoints(int points) {
+
+        this.points = points;
     }
 
     @Override

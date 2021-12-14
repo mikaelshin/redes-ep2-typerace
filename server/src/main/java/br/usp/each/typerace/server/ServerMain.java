@@ -2,6 +2,7 @@ package br.usp.each.typerace.server;
 
 import org.java_websocket.server.WebSocketServer;
 import java.util.HashMap;
+import java.util.List;
 
 public class ServerMain {
 
@@ -12,16 +13,20 @@ public class ServerMain {
     }
 
     public WebSocketServer getServer() {
+
         return this.server;
     }
 
     public void init() {
-        this.getServer().onStart();
 
+        System.out.println("tets");
+        server.start();
     }
 
     public static void main(String[] args) {
-        WebSocketServer server = new Server(8080, new HashMap<>());
+
+        WebSocketServer server = new Server(8081, new HashMap<>());
+//        List<String> wordsList = TypeRace.getWordsListFromFile(20);
 
         ServerMain main = new ServerMain(server);
 

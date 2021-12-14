@@ -1,11 +1,13 @@
 package br.usp.each.typerace.server;
 
+
 import java.io.*;
 import java.util.*;
 
+
 public class TypeRace {
 
-    public static List<String> getWordsListFromFile(int qtd) {
+    public static List<String> getWordsListFromFile(int length) {
 
         String randomWord = "";
         List<String> wordsList = new ArrayList<String>();
@@ -30,7 +32,7 @@ public class TypeRace {
 
             Random random = new Random(System.currentTimeMillis());
 
-            while (wordsList.size() != qtd) {
+            while (wordsList.size() != length) {
 
                 while (randomWord.length() < 5)
                     randomWord = words.get(random.nextInt(words.size()));
@@ -47,5 +49,13 @@ public class TypeRace {
         }
 
         return wordsList;
+    }
+
+    public static int setPoints(List<String> wordsList, String typedWord, int points, int cont) {
+
+        if (typedWord.equals(wordsList.get(cont)))
+            return points + 5;
+
+        else return points;
     }
 }
