@@ -4,18 +4,18 @@ import java.util.*;
 
 public class GameInfo {
 
-    private List<String> nick;
+    private String nick;
     private int players;
     private int words;
 
-    public GameInfo(List<String> nick, int players, int words) {
+    public GameInfo(String nick, int players, int words) {
 
         this.nick = nick;
         this.players = players;
         this.words = words;
     }
 
-    public List<String> getNick() {
+    public String getNick() {
         return nick;
     }
 

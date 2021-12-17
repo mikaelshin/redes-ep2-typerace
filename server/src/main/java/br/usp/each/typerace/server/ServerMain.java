@@ -1,8 +1,11 @@
 package br.usp.each.typerace.server;
 
 import org.java_websocket.server.WebSocketServer;
+
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Scanner;
 
 public class ServerMain {
 
@@ -24,12 +27,18 @@ public class ServerMain {
 
     public static void main(String[] args) {
 
+        Scanner sc = new Scanner(System.in);
         WebSocketServer server = new Server(8081, new HashMap<>());
-//        List<String> wordsList = TypeRace.getWordsListFromFile(20);
+        ServerMain serverMain = new ServerMain(server);
+        List<String> wordsList = new ArrayList<>();
+        
+        serverMain.init();
 
-        ServerMain main = new ServerMain(server);
+        while (true) {
 
-        main.init();
+            if (sc.nextLine().equalsIgnoreCase("quit"))
+                System.exit(0);
+        }
     }
 
 }

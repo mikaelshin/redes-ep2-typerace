@@ -7,18 +7,18 @@ import java.net.URI;
 
 public class Client extends WebSocketClient {
 
-    private int id;
+    private String nick;
     private int points;
 
-    public Client(URI serverUri, int id) {
+    public Client(URI serverUri, String nick) {
 
         super(serverUri);
-        this.id = id;
+        this.nick = nick;
     }
 
-    public int getId() {
+    public String getNick() {
 
-        return this.id;
+        return this.nick;
     }
 
     public int getPoints() {
@@ -33,12 +33,14 @@ public class Client extends WebSocketClient {
 
     @Override
     public void onOpen(ServerHandshake handshakedata) {
-        // TODO: Implementar
+        
+        send("estabilishingConnection"); 
     }
 
     @Override
     public void onMessage(String message) {
-        // TODO: Implementar
+
+        System.out.println(message);
     }
 
     @Override
