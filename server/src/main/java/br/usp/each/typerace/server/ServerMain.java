@@ -1,11 +1,7 @@
 package br.usp.each.typerace.server;
 
 import org.java_websocket.server.WebSocketServer;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 
 public class ServerMain {
 
@@ -30,7 +26,6 @@ public class ServerMain {
         Scanner sc = new Scanner(System.in);
         WebSocketServer server = new Server(8081, new HashMap<>());
         ServerMain serverMain = new ServerMain(server);
-        List<String> wordsList = new ArrayList<>();
         
         serverMain.init();
 

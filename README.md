@@ -14,13 +14,10 @@ Repositório para o EP2 da disciplina ACH2026 - Redes de Computadores
 ### Rodando
 Para rodar o servidor
 ```sh
-./gradlew server:run --console=plain
+gradlew server:run --console=plain
 ```
 
 Para rodar um cliente 
 ```sh
-chcp 65001
-```
-```sh
-./gradlew client:run --console=plain
+gradlew client:run --console=plain
 ```
