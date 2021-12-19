@@ -5,38 +5,37 @@ import org.java_websocket.handshake.ClientHandshake;
 import org.java_websocket.server.WebSocketServer;
 import java.net.InetSocketAddress;
 import java.util.*;
-import java.lang.*;
-import br.usp.each.typerace.*;
 
 public class Server extends WebSocketServer {
 
-    private int nConnections = 0;
-    private boolean gameStarted = false;
-    private final Map<String, WebSocket> connections;
-    List<String> wordsList = TypeRace.getWordsList(20);
-    private String nick;
+    private static int nConnections = 0;
     private static int id = 0;
-    Player player = null;
+    private static boolean gameStarted = false;
+    private final Map<String, WebSocket> connections;
+    private List<String> wordsList = TypeRace.getWordsList(20);
+    private Map<String, List<String>> currentWordsList = new HashMap<>();
+    private static String line = "--------------------------------------------";
 
     public Server(int port, Map<String, WebSocket> connections) {
         super(new InetSocketAddress(port));
         this.connections = connections;
     }
 
-    private String getPlayerId(String resourceDescriptor) {
-        return resourceDescriptor.substring(resourceDescriptor.indexOf("nick=") + 5);
-    }
-
     private String getPlayerId(WebSocket conn) {
-        return getPlayerId(conn.getResourceDescriptor());
+
+        String descriptor = conn.getResourceDescriptor();
+        return descriptor.substring(descriptor.indexOf("=") + 1);
     }
 
     @Override
     public void onOpen(WebSocket conn, ClientHandshake handshake) {
         
-        this.nick = getPlayerId(conn);
-        this.connections.put(nick, conn);
-        player = new Player(id++, this.nick, 0);
+        String playerNick = getPlayerId(conn);
+        this.connections.put(playerNick, conn);
+        Player player = new Player(id++, playerNick, 0);
+        List<String> copyWordsList = new ArrayList<>();
+        copyWordsList.addAll(wordsList);
+        currentWordsList.put(player.getNick(), copyWordsList);
     }
 
     @Override
@@ -58,33 +57,38 @@ public class Server extends WebSocketServer {
         if (this.connections.size() == nConnections && message.equals("start")) {
 
             startGameMessage();
-            
-            String words = "";
-
-            for (String word : this.wordsList)
-                words += "  " + word;   
-
-            broadcast(words);
+            broadcastWordsList();
             gameStarted = true;
         }
 
         if (gameStarted && !message.equals("start")) {
 
-            List<List<String>> list = new ArrayList<>();
+            String currentPlayerNick = getPlayerId(conn);
+            Player currentPlayer = getCurrentPlayer(currentPlayerNick);
 
-            System.out.println("Nick: " + nick);
-            list.add(wordsList);
-            System.out.println("Id: " + (player.getId() - 1) + ", Nick: " + player.getNick());
+            System.out.println(line);
+            System.out.println("Nick: " + currentPlayerNick);
+            System.out.println("Id: " + (currentPlayer.getId()) + ", Nick: " + currentPlayer.getNick());
+            System.out.println(line);
+            System.out.println("Lista Antes " + currentPlayer.getId() + ": " + Arrays.toString(currentWordsList.get(currentPlayerNick).toArray()));
+            System.out.println(line);
             
-            System.out.println(Arrays.toString(list.get(player.getId()-1).toArray()));
-
-            if (message.equalsIgnoreCase(list.get(player.getId()-1).get(0)))
-                player.setPoints();              
+            if (message.equalsIgnoreCase(currentWordsList.get(currentPlayerNick).get(0)))
+                currentPlayer.setPoints();              
+            System.out.println(line);
             
-            System.out.println("o jogador " + player.getNick() + " digitou e seu id é " + (player.getId() - 1));
-            System.out.println("o jogador " + player.getNick() + " está com " + player.getPoints());
+            System.out.println("o jogador " + currentPlayer.getNick() + " digitou e seu id é " + (currentPlayer.getId()));
+            System.out.println("o jogador " + currentPlayer.getNick() + " está com " + currentPlayer.getPoints());
 
-            list.get(player.getId()-1).remove(0);
+            System.out.println(line);
+            
+            currentWordsList.get(currentPlayerNick).remove(0);
+
+            System.out.println("Lista Depois " + currentPlayer.getId() + ": " + Arrays.toString(currentWordsList.get(currentPlayerNick).toArray()));
+            System.out.println(line);
+
+            sendWordsList(conn, currentWordsList.get(currentPlayerNick));
+            
         }
 
     }
@@ -124,5 +128,39 @@ public class Server extends WebSocketServer {
 
             e.printStackTrace();
         }
+    }
+
+    private Player getCurrentPlayer(String nick) {
+
+        Map<String, Player> instances = Player.getInstances();
+
+        for (String key : instances.keySet())
+            if (key.equals(nick)) 
+                return instances.get(key);
+
+        return null;
+    }
+
+    private void broadcastWordsList() {
+
+        String words = "";
+
+        for (String word : this.wordsList)
+            words += "  " + word;   
+
+        broadcast(words);
+    }
+
+    private void sendWordsList(WebSocket conn, List<String> wordsList) {
+
+        String words = "";
+        System.out.println("\n");
+
+        for (String word : wordsList)
+            words += "  " + word;   
+
+        words += "\nR: "; 
+
+        conn.send(words);
     }
 }
