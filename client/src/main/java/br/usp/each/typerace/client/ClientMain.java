@@ -3,10 +3,7 @@ package br.usp.each.typerace.client;
 import org.java_websocket.client.WebSocketClient;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Scanner;
-import java.util.concurrent.TimeUnit;
 
 public class ClientMain {
 
@@ -47,8 +44,7 @@ public class ClientMain {
 
                 startMenu(sc);
 
-                System.out.println("Type your nickname: ");
-                String nick = sc.nextLine();
+                String nick = createPlayer(sc);
                 
                 client = new Client(new URI(url + "/nick=" + nick), nick);
                 ClientMain clientMain = new ClientMain(client);
@@ -72,7 +68,6 @@ public class ClientMain {
 
             e.printStackTrace();
             System.out.print(e.getMessage());
-
         } 
     }
 
@@ -104,7 +99,7 @@ public class ClientMain {
             else if (!command.equalsIgnoreCase("S"))
                 System.out.println("Type a valid command! \n");
 
-        } while (!command.equalsIgnoreCase("S"));
+        } while (!command.trim().equalsIgnoreCase("S"));
 
     }
 
@@ -113,73 +108,5 @@ public class ClientMain {
         System.out.println("Type your nickname: ");
         return sc.nextLine();
     }
-
-    private static GameInfo playMenu(Scanner sc) {
-
-        String players = "";
-        String words = "";
-        String nick = "";
-        int nPlayers = 0;
-        int nWords = 0;
-
-        try {
-
-            do {
-                System.out.println("How many players (1 - 4)? ");
-                players = sc.nextLine();
-                nPlayers = tryParseInt(players, 0);
-
-                System.out.println("Type your nickname: ");
-                nick = sc.nextLine();
-
-                System.out.println("How many words (5 - 150)? ");
-                words = sc.nextLine();
-                nWords = tryParseInt(words, 0);
-
-                if (nPlayers < 1 || nPlayers > 4)
-                    System.out.println("Type a number between 1 - 4 for players!");
-
-                if (nWords < 5 || nWords > 30)
-                    System.out.println("Type a number between 5 - 30 for words!");
-
-            } while (nPlayers < 1 || nPlayers > 4 || nWords < 5 || nWords > 150);
-
-        } catch (Exception e) {
-
-            e.printStackTrace();
-        }
-
-        return new GameInfo(nick, nPlayers, nWords);
-    }
-
-    private static void startGame() {
-
-        try {
-
-            for (int cont = 3; cont >= 1; cont--) {
-                System.out.print(cont + " ");
-                Thread.sleep(1000);
-            }
-            System.out.println("\nReady...");
-            System.out.println("Go!");
-
-        } catch (Exception e) {
-
-            e.printStackTrace();
-        }
-    }
-
-    public static int tryParseInt(String value, int defaultVal) {
-
-        try {
-
-            return Integer.parseInt(value);
-
-        } catch (NumberFormatException e) {
-
-            return defaultVal;
-        }
-    }
-
 
 }
