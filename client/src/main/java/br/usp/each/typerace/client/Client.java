@@ -2,33 +2,16 @@ package br.usp.each.typerace.client;
 
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.handshake.ServerHandshake;
-
 import java.net.URI;
 
 public class Client extends WebSocketClient {
+    
 
-    private String nick;
-    private int points;
-
-    public Client(URI serverUri, String nick) {
+    public Client(URI serverUri) {
 
         super(serverUri);
-        this.nick = nick;
-    }
-
-    public String getNick() {
-
-        return this.nick;
-    }
-
-    public int getPoints() {
-
-        return this.points;
-    }
-
-    public void setPoints(int points) {
-
-        this.points = points;
+        ClientMain.flagConnected = true;
+        ClientMain.flagGameOver = false;
     }
 
     @Override
@@ -40,16 +23,28 @@ public class Client extends WebSocketClient {
     @Override
     public void onMessage(String message) {
 
-        System.out.println(message);
+        if (message.equals("gameover"))
+            ClientMain.flagGameOver = true;
+        else 
+            System.out.println(message);
     }
 
     @Override
     public void onClose(int code, String reason, boolean remote) {
-        // TODO: Implementar
+
+        if (code == 1001)
+            ClientMain.flagConnected = false;
+        
+        else {
+            System.out.println("\nHope see you soon. Bye!");
+            System.exit(0);
+        }
     }
 
     @Override
     public void onError(Exception ex) {
-        // TODO: Implementar
+
+        ex.printStackTrace();
     }
+
 }

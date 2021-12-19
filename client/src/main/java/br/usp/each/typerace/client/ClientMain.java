@@ -7,6 +7,9 @@ import java.util.Scanner;
 
 public class ClientMain {
 
+    public static boolean flagConnected;
+    public static boolean flagGameOver;
+
     private WebSocketClient client;
 
     public ClientMain(WebSocketClient client) {
@@ -46,23 +49,43 @@ public class ClientMain {
 
                 String nick = createPlayer(sc);
                 
-                client = new Client(new URI(url + "/nick=" + nick), nick);
+                client = new Client(new URI(url + "/nick=" + nick));
                 ClientMain clientMain = new ClientMain(client);
                 clientMain.init(nick);
                 
-                if (client.isOpen())
+                try {
+
+                    Thread.sleep(1000);
+                }
+                catch(Exception e) {
+        
+                    e.printStackTrace();
+                } 
+
+                if (client.isOpen() && flagConnected)
                     break;
             }
 
-            System.out.println("Type anything to start the game: ");
             sc.nextLine();
             client.send("start");
 
-            while (true) {
+            while (true && !flagGameOver) {
 
                 String in = sc.nextLine();
                 client.send(in);
             }
+
+            try {
+
+                Thread.sleep(700);
+            }
+            catch(Exception e) {
+    
+                e.printStackTrace();
+            } 
+
+            client.send("gameover");
+            System.out.println("\nGame Over!");
 
         } catch (URISyntaxException e) {
 
@@ -84,20 +107,20 @@ public class ClientMain {
             System.out.println("[E]: Exit");
             command = sc.nextLine();
             
-            if (command.equalsIgnoreCase("R")) {
-                System.out.println("1. For each typed word correctly, you earns 1 point.");
+            if (command.trim().equalsIgnoreCase("R")) {
+                System.out.println("\n1. For each typed word correctly, you earn 1 point.");
                 System.out.println("2. There's no point discount, even if you miss the word.");
-                System.out.println("3. You have 1 minute to type the desired amount of words.");
+                System.out.println("3. The player who writes the most words correctly wins.");
                 System.out.println("4. Have fun!");
             }
 
-            else if (command.equalsIgnoreCase("E")){
-                System.out.println("Game Over! \n");
-                System.exit(1);
+            else if (command.trim().equalsIgnoreCase("E")){
+                System.out.println("\nQuitting the game.");
+                System.exit(0);
             }
 
             else if (!command.equalsIgnoreCase("S"))
-                System.out.println("Type a valid command! \n");
+                System.out.println("\nType a valid command!");
 
         } while (!command.trim().equalsIgnoreCase("S"));
 
@@ -105,8 +128,7 @@ public class ClientMain {
 
     private static String createPlayer(Scanner sc) {
 
-        System.out.println("Type your nickname: ");
+        System.out.println("\nType your nickname: ");
         return sc.nextLine();
     }
-
 }

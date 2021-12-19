@@ -5,6 +5,7 @@ import org.java_websocket.handshake.ClientHandshake;
 import org.java_websocket.server.WebSocketServer;
 import java.net.InetSocketAddress;
 import java.util.*;
+import java.util.Map.Entry;
 
 public class Server extends WebSocketServer {
 
@@ -14,33 +15,47 @@ public class Server extends WebSocketServer {
     private final Map<String, WebSocket> connections;
     private List<String> wordsList = TypeRace.getWordsList(20);
     private Map<String, List<String>> currentWordsList = new HashMap<>();
-    private static String line = "--------------------------------------------";
 
     public Server(int port, Map<String, WebSocket> connections) {
         super(new InetSocketAddress(port));
         this.connections = connections;
     }
 
-    private String getPlayerId(WebSocket conn) {
+    private String getPlayerNick(WebSocket conn) {
 
-        String descriptor = conn.getResourceDescriptor();
-        return descriptor.substring(descriptor.indexOf("=") + 1);
+        String desc = conn.getResourceDescriptor();
+        return desc.substring(desc.indexOf("=") + 1);
     }
 
     @Override
     public void onOpen(WebSocket conn, ClientHandshake handshake) {
         
-        String playerNick = getPlayerId(conn);
-        this.connections.put(playerNick, conn);
-        Player player = new Player(id++, playerNick, 0);
-        List<String> copyWordsList = new ArrayList<>();
-        copyWordsList.addAll(wordsList);
-        currentWordsList.put(player.getNick(), copyWordsList);
+        if (this.connections.containsKey(getPlayerNick(conn))) {
+
+            conn.send("\nNick already used. Please, type another one.\n");
+            conn.close(1001);
+        
+        } else {
+
+            String playerNick = getPlayerNick(conn);
+            this.connections.put(playerNick, conn);
+            Player player = new Player(id++, playerNick, 0);
+            List<String> copyWordsList = new ArrayList<>();
+            copyWordsList.addAll(wordsList);
+    
+            currentWordsList.put(player.getNick(), copyWordsList);
+        }
     }
 
     @Override
     public void onClose(WebSocket conn, int code, String reason, boolean remote) {
-        // TODO: Implementar
+        
+        if (code != 1001) {
+
+            String playerNick = getPlayerNick(conn);
+            this.connections.remove(playerNick);
+            broadcast("\n" + playerNick + " has quit.\n");
+        }
     }
 
     @Override
@@ -48,7 +63,8 @@ public class Server extends WebSocketServer {
 
         if (message.equals("estabilishingConnection")) {
 
-            conn.send("Connection estabilished successfully.");
+            conn.send("\nConnection estabilished successfully!\nPress \"Enter\" to get ready the game or wait for more players.");
+            broadcast("Number of player(s): " + this.connections.size());
             return;
         }
 
@@ -63,32 +79,21 @@ public class Server extends WebSocketServer {
 
         if (gameStarted && !message.equals("start")) {
 
-            String currentPlayerNick = getPlayerId(conn);
+            String currentPlayerNick = getPlayerNick(conn);
             Player currentPlayer = getCurrentPlayer(currentPlayerNick);
 
-            System.out.println(line);
-            System.out.println("Nick: " + currentPlayerNick);
-            System.out.println("Id: " + (currentPlayer.getId()) + ", Nick: " + currentPlayer.getNick());
-            System.out.println(line);
-            System.out.println("Lista Antes " + currentPlayer.getId() + ": " + Arrays.toString(currentWordsList.get(currentPlayerNick).toArray()));
-            System.out.println(line);
-            
             if (message.equalsIgnoreCase(currentWordsList.get(currentPlayerNick).get(0)))
                 currentPlayer.setPoints();              
-            System.out.println(line);
-            
-            System.out.println("o jogador " + currentPlayer.getNick() + " digitou e seu id é " + (currentPlayer.getId()));
-            System.out.println("o jogador " + currentPlayer.getNick() + " está com " + currentPlayer.getPoints());
-
-            System.out.println(line);
             
             currentWordsList.get(currentPlayerNick).remove(0);
 
-            System.out.println("Lista Depois " + currentPlayer.getId() + ": " + Arrays.toString(currentWordsList.get(currentPlayerNick).toArray()));
-            System.out.println(line);
-
             sendWordsList(conn, currentWordsList.get(currentPlayerNick));
             
+            if(currentWordsList.get(currentPlayerNick).isEmpty()) {
+
+                getPlacing();
+                broadcast("gameover"); 
+            }
         }
 
     }
@@ -101,7 +106,8 @@ public class Server extends WebSocketServer {
 
     @Override
     public void onStart() {
-        // TODO: Implementar
+        
+        System.out.println("Server initialized in " + getPort());
     }
 
     private void startGameMessage() {
@@ -159,8 +165,53 @@ public class Server extends WebSocketServer {
         for (String word : wordsList)
             words += "  " + word;   
 
-        words += "\nR: "; 
-
         conn.send(words);
+    }
+
+    private void getPlacing() {
+
+        String print = "\nPlacing: \n";
+        String ordinal = "";
+        Map<String, Player> instances = Player.getInstances();
+        Map<String, Integer> playerNickAndPoints = new HashMap<>();
+
+        for (String key : instances.keySet()) {
+            Player player = instances.get(key);
+            playerNickAndPoints.put(player.getNick(), player.getPoints());
+        }
+
+        playerNickAndPoints = sortByValue(playerNickAndPoints);
+
+        int place = this.connections.size();
+
+        for (Map.Entry<String, Integer> entry : playerNickAndPoints.entrySet()) {
+
+            if (place == 3)
+                ordinal = "rd";
+            else if (place == 2)
+                ordinal = "nd";
+            else if (place == 1)
+                ordinal = "st";
+            else 
+                ordinal = "th";
+
+            print += place + ordinal + " Place: " + entry.getKey() + " (" + entry.getValue() + " points) \n";
+            place--;
+        }
+
+        broadcast(print);
+    }
+
+    public static <K, V extends Comparable<? super V>> Map<K, V> sortByValue(Map<K, V> map) {
+        
+        List<Entry<K, V>> list = new ArrayList<>(map.entrySet());
+        list.sort(Entry.comparingByValue());
+
+        Map<K, V> result = new HashMap<>();
+        for (Entry<K, V> entry : list) {
+            result.put(entry.getKey(), entry.getValue());
+        }
+
+        return result;
     }
 }

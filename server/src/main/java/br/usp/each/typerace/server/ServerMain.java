@@ -31,9 +31,22 @@ public class ServerMain {
 
         while (true) {
 
-            if (sc.nextLine().equalsIgnoreCase("quit"))
-                System.exit(0);
+            try {
+
+                if (sc.nextLine().equalsIgnoreCase("stop")) { 
+                    server.stop(1000);
+                    break;
+                }
+            
+            } catch (InterruptedException e) {
+
+                e.printStackTrace();
+            }
         }
+
+        System.out.println("\nServer stopped.");
+        
+        sc.close();
     }
 
 }
