@@ -5,7 +5,6 @@ import org.java_websocket.handshake.ClientHandshake;
 import org.java_websocket.server.WebSocketServer;
 import java.net.InetSocketAddress;
 import java.util.*;
-import java.util.Map.Entry;
 
 public class Server extends WebSocketServer {
 
@@ -90,9 +89,9 @@ public class Server extends WebSocketServer {
             sendWordsList(conn, currentWordsList.get(currentPlayerNick));
             
             if(currentWordsList.get(currentPlayerNick).isEmpty()) {
-
                 getPlacing();
-                broadcast("gameover"); 
+                broadcast("gameover");
+                System.exit(0);
             }
         }
 
@@ -174,17 +173,21 @@ public class Server extends WebSocketServer {
         String ordinal = "";
         Map<String, Player> instances = Player.getInstances();
         Map<String, Integer> playerNickAndPoints = new HashMap<>();
+        LinkedHashMap<String, Integer> classification = new LinkedHashMap<>();
 
         for (String key : instances.keySet()) {
             Player player = instances.get(key);
             playerNickAndPoints.put(player.getNick(), player.getPoints());
         }
 
-        playerNickAndPoints = sortByValue(playerNickAndPoints);
+        playerNickAndPoints.entrySet()
+            .stream()
+            .sorted(Map.Entry.comparingByValue())
+            .forEachOrdered(x -> classification.put(x.getKey(), x.getValue()));  
 
         int place = this.connections.size();
 
-        for (Map.Entry<String, Integer> entry : playerNickAndPoints.entrySet()) {
+        for (Map.Entry<String, Integer> entry : classification.entrySet()) {
 
             if (place == 3)
                 ordinal = "rd";
@@ -202,16 +205,4 @@ public class Server extends WebSocketServer {
         broadcast(print);
     }
 
-    public static <K, V extends Comparable<? super V>> Map<K, V> sortByValue(Map<K, V> map) {
-        
-        List<Entry<K, V>> list = new ArrayList<>(map.entrySet());
-        list.sort(Entry.comparingByValue());
-
-        Map<K, V> result = new HashMap<>();
-        for (Entry<K, V> entry : list) {
-            result.put(entry.getKey(), entry.getValue());
-        }
-
-        return result;
-    }
 }
