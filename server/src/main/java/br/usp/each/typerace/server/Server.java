@@ -62,7 +62,7 @@ public class Server extends WebSocketServer {
 
         if (message.equals("estabilishingConnection")) {
 
-            conn.send("\nConnection estabilished successfully!\nPress \"Enter\" to get ready the game or wait for more players.");
+            conn.send("\nConnection estabilished successfully!\nPress \"Enter\" to get ready or wait for more players.");
             broadcast("Number of player(s): " + this.connections.size());
             return;
         }
@@ -82,19 +82,21 @@ public class Server extends WebSocketServer {
             Player currentPlayer = getCurrentPlayer(currentPlayerNick);
 
             if (message.equalsIgnoreCase(currentWordsList.get(currentPlayerNick).get(0)))
-                currentPlayer.setPoints();              
+                currentPlayer.setPoints();   
+            else 
+                currentPlayer.setErrors();           
             
             currentWordsList.get(currentPlayerNick).remove(0);
 
             sendWordsList(conn, currentWordsList.get(currentPlayerNick));
             
-            if(currentWordsList.get(currentPlayerNick).isEmpty()) {
-                getPlacing();
+            if (currentWordsList.get(currentPlayerNick).isEmpty()) {
+
+                broadcastResults();
                 broadcast("gameover");
                 System.exit(0);
             }
         }
-
     }
 
     @Override
@@ -148,36 +150,57 @@ public class Server extends WebSocketServer {
 
     private void broadcastWordsList() {
 
+        int i = 0;
         String words = "";
+        System.out.println("\n");
 
-        for (String word : this.wordsList)
-            words += "  " + word;   
+        for (String word : wordsList) {
+
+            if (i == 0)
+                words = word;
+                
+            else
+                words += " - " + word;   
+            
+            i++;
+        }
 
         broadcast(words);
     }
 
     private void sendWordsList(WebSocket conn, List<String> wordsList) {
 
-        String words = "";
+        int i = 0;
+        String words = "\n";
         System.out.println("\n");
 
-        for (String word : wordsList)
-            words += "  " + word;   
+        for (String word : wordsList) {
+
+            if (i == 0)
+                words = word;
+                
+            else
+                words += " - " + word;   
+            
+            i++;
+        }
 
         conn.send(words);
     }
 
-    private void getPlacing() {
+    private void broadcastResults() {
 
         String print = "\nPlacing: \n";
         String ordinal = "";
         Map<String, Player> instances = Player.getInstances();
         Map<String, Integer> playerNickAndPoints = new HashMap<>();
-        LinkedHashMap<String, Integer> classification = new LinkedHashMap<>();
+        Map<String, Integer> playerNickAndErrors = new HashMap<>();
+        Map<String, Integer> classification = new LinkedHashMap<>();
 
         for (String key : instances.keySet()) {
             Player player = instances.get(key);
             playerNickAndPoints.put(player.getNick(), player.getPoints());
+            playerNickAndErrors.put(player.getNick(), player.getErrors());
         }
 
         playerNickAndPoints.entrySet()
@@ -202,7 +225,15 @@ public class Server extends WebSocketServer {
             place--;
         }
 
-        broadcast(print);
+        print += "\nErrors: \n";
+
+        for (Map.Entry<String, Integer> entry : playerNickAndErrors.entrySet()) {
+
+            print += entry.getKey() + " made " + entry.getValue() + " errors. \n";
+            place--;
+        }
+
+        broadcast(print + "\n");
     }
 
 }

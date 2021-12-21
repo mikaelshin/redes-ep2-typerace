@@ -24,7 +24,7 @@ public class ServerMain {
     public static void main(String[] args) {
 
         Scanner sc = new Scanner(System.in);
-        WebSocketServer server = new Server(8081, new HashMap<>());
+        WebSocketServer server = new Server(8082, new HashMap<>());
         ServerMain serverMain = new ServerMain(server);
         
         serverMain.init();
