@@ -93,8 +93,8 @@ public class ClientMain {
             if (command.trim().equalsIgnoreCase("R")) {
                 System.out.println("1. For each typed word correctly, you earn 1 point.");
                 System.out.println("2. There's no point discount, even if you miss the word.");
-                System.out.println("3. The game will give 20 words to you type correctly.");
-                System.out.println("4. The player who writes the most words correctly wins.");
+                System.out.println("3. The game will dispose 30 words to you type it correctly.");
+                System.out.println("4. The game will end if one of the players get 10 points. Or else, will end if one of the players type all of the 30 words and the player who writes the most words correctly wins.");
                 System.out.println("5. Have fun!");
             }
 
