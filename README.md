@@ -11,6 +11,13 @@ Repositório para o EP2 da disciplina ACH2026 - Redes de Computadores
 * JDK 11 ou maior (testado com a JDK11 OpenJDK)
 * Gradle (incluso no repositório, não é necessário instalá-lo)
 
+## Regras do TypeRace
+- Para cada palavra escrita corretamente, o jogador ganha 1 ponto.
+- Nenhum ponto é descontado, mesmo se o jogador errar a palavra.
+- O jogo vai disponibilizar 20 palavras para o jogador escrever corretamente.
+- O jogador que escrever mais palavras corretamente vence o jogo.
+- Divirta-se!
+
 ### Rodando
 Para rodar o servidor
 ```sh
