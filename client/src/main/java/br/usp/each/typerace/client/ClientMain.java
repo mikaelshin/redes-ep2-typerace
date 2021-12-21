@@ -30,11 +30,6 @@ public class ClientMain {
     }
 
     public static void main(String[] args) {
-        /*
-           FIXME: Remover essas strings fixas
-           Como podemos fazer para que o cliente receba um parâmetro indicando a qual servidor
-           ele deve se conectar e o seu ID?
-        */
 
         try {
 
@@ -43,7 +38,7 @@ public class ClientMain {
             
             while (true) {
 
-                String url = "ws://localhost:8081";
+                String url = "ws://localhost:8082";
 
                 startMenu(sc);
 
@@ -108,10 +103,11 @@ public class ClientMain {
             command = sc.nextLine();
             
             if (command.trim().equalsIgnoreCase("R")) {
-                System.out.println("\n1. For each typed word correctly, you earn 1 point.");
+                System.out.println("1. For each typed word correctly, you earn 1 point.");
                 System.out.println("2. There's no point discount, even if you miss the word.");
-                System.out.println("3. The player who writes the most words correctly wins.");
-                System.out.println("4. Have fun!");
+                System.out.println("3. The game will give 20 words to you type correctly.");
+                System.out.println("4. The player who writes the most words correctly wins.");
+                System.out.println("5. Have fun!");
             }
 
             else if (command.trim().equalsIgnoreCase("E")){
