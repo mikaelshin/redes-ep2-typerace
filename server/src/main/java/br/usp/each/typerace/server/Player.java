@@ -6,6 +6,7 @@ public class Player {
     private int id;
     private String nick;
     private int points;
+    private int errors;
     private static Map<String, Player> instances = new HashMap<>();
     
     public Player(int id, String nick, int points) {
@@ -29,6 +30,16 @@ public class Player {
     public void setPoints() {
 
         this.points++;
+    }
+
+    public int getErrors() {
+
+        return this.errors;
+    }
+
+    public void setErrors() {
+
+        this.errors++;
     }
 
     public String getNick() {
