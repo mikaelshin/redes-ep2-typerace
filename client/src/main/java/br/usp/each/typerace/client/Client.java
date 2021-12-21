@@ -23,8 +23,11 @@ public class Client extends WebSocketClient {
     @Override
     public void onMessage(String message) {
 
-        if (message.equals("gameover"))
-            ClientMain.flagGameOver = true;
+        if (message.equals("gameover")) {
+
+            System.out.println("\nGame Over!");
+            System.exit(0);
+        }
         else 
             System.out.println(message);
     }

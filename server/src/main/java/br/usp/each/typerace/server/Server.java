@@ -12,8 +12,9 @@ public class Server extends WebSocketServer {
     private static int id = 0;
     private static boolean gameStarted = false;
     private final Map<String, WebSocket> connections;
-    private List<String> wordsList = TypeRace.getWordsList(20);
+    private List<String> wordsList = TypeRace.getWordsList(30);
     private Map<String, List<String>> currentWordsList = new HashMap<>();
+    private static long init; 
 
     public Server(int port, Map<String, WebSocket> connections) {
         super(new InetSocketAddress(port));
@@ -37,6 +38,7 @@ public class Server extends WebSocketServer {
         } else {
 
             String playerNick = getPlayerNick(conn);
+            System.out.println("The " + playerNick + " has connected.");
             this.connections.put(playerNick, conn);
             Player player = new Player(id++, playerNick, 0);
             List<String> copyWordsList = new ArrayList<>();
@@ -74,6 +76,7 @@ public class Server extends WebSocketServer {
             startGameMessage();
             broadcastWordsList();
             gameStarted = true;
+            init = System.currentTimeMillis() / 1000;
         }
 
         if (gameStarted && !message.equals("start")) {
@@ -90,11 +93,14 @@ public class Server extends WebSocketServer {
 
             sendWordsList(conn, currentWordsList.get(currentPlayerNick));
             
-            if (currentWordsList.get(currentPlayerNick).isEmpty()) {
+            if (currentWordsList.get(currentPlayerNick).isEmpty() || currentPlayer.getPoints() == 10) {  
 
                 broadcastResults();
+                long end = System.currentTimeMillis() / 1000;
+                broadcast("Game time: " + (end - init) + " seconds.");
+                nConnections = 0; 
+                wordsList = TypeRace.getWordsList(30);
                 broadcast("gameover");
-                System.exit(0);
             }
         }
     }
@@ -233,7 +239,7 @@ public class Server extends WebSocketServer {
             place--;
         }
 
-        broadcast(print + "\n");
+        broadcast(print);
     }
 
 }

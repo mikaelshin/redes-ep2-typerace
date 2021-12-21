@@ -70,18 +70,6 @@ public class ClientMain {
                 client.send(in);
             }
 
-            try {
-
-                Thread.sleep(700);
-            }
-            catch(Exception e) {
-    
-                e.printStackTrace();
-            } 
-
-            client.send("gameover");
-            System.out.println("\nGame Over!");
-
         } catch (URISyntaxException e) {
 
             e.printStackTrace();
